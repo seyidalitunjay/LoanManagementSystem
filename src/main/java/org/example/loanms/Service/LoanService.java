@@ -1,5 +1,6 @@
 package org.example.loanms.Service;
 
+import org.example.loanms.Exceptions.LoanNotFoundException;
 import org.example.loanms.Model.Loan;
 import org.example.loanms.Repo.LoanRepo;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class LoanService {
 
     public Loan getLoanById(Long id) {
         return repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Loan Not Found"));
+                .orElseThrow(() -> new LoanNotFoundException("Loan with ID " + id + " not found"));
     }
 
     public Loan updateLoanStatus(Long id, String Status){
