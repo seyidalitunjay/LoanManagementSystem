@@ -1,12 +1,10 @@
 package org.example.loanms.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.loanms.Enum.LoanStatus;
 
 import java.time.LocalDate;
 
@@ -14,23 +12,18 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Loan {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String  applicantName;
-
+    private String applicantName;
     private long amount;
-
     private int termMonth;
-
     private String purpose;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private LoanStatus status;
 
     private LocalDate applicationDate;
-
 }
