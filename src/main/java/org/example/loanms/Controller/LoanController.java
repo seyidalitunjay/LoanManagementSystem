@@ -1,5 +1,6 @@
 package org.example.loanms.Controller;
 
+import org.example.loanms.Enum.LoanStatus;
 import org.example.loanms.Model.Loan;
 import org.example.loanms.Service.LoanService;
 import org.springframework.web.bind.annotation.*;
@@ -7,9 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/loans/")
+@RequestMapping("/api/loans")
 public class LoanController {
-
     private final LoanService service;
 
     public LoanController(LoanService service) {
@@ -26,13 +26,13 @@ public class LoanController {
         return service.getAllLoans();
     }
 
-    @GetMapping({"/{id}"})
+    @GetMapping("/{id}")
     public Loan getLoanById(@PathVariable Long id) {
         return service.getLoanById(id);
     }
 
     @PutMapping("/{id}/status")
-    public Loan updateLoanStatus(@PathVariable Long id, @RequestParam String status) {
+    public Loan updateLoanStatus(@PathVariable Long id, @RequestParam LoanStatus status) {
         return service.updateLoanStatus(id, status);
     }
 }

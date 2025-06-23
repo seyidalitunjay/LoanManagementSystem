@@ -1,5 +1,6 @@
 package org.example.loanms.Service;
 
+import org.example.loanms.Enum.LoanStatus;
 import org.example.loanms.Exceptions.LoanNotFoundException;
 import org.example.loanms.Model.Loan;
 import org.example.loanms.Repo.LoanRepo;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Service
 public class LoanService {
+    private static final int PENDING_EXPIRATION_DAYS = 7;
 
     private final LoanRepo repo;
 
@@ -19,18 +21,19 @@ public class LoanService {
     }
 
     private void validateLoan(Loan loan) {
-        if (loan.getAmount() < 0) {
-            throw new IllegalArgumentException("Amount must be greater than 0");
+        if (loan.getAmount() <= 0) {
+            throw new IllegalArgumentException("Loan amount must be greater than 0");
         }
     }
 
     public Loan createLoan(Loan loan) {
         validateLoan(loan);
-        loan.setStatus("PENDING");
+        loan.setStatus(LoanStatus.PENDING);
+        loan.setApplicationDate(LocalDate.now());
         return repo.save(loan);
     }
 
-    public List<Loan> getAllLoans(){
+    public List<Loan> getAllLoans() {
         return repo.findAll();
     }
 
@@ -39,29 +42,27 @@ public class LoanService {
                 .orElseThrow(() -> new LoanNotFoundException("Loan with ID " + id + " not found"));
     }
 
-    public Loan updateLoanStatus(Long id, String Status){
+    public Loan updateLoanStatus(Long id, LoanStatus newStatus) {
         Loan loan = getLoanById(id);
-        loan.setStatus(Status);
+
+        if (!LoanStatus.isValidTransition(loan.getStatus(), newStatus)) {
+            throw new IllegalStateException("Invalid status transition from " +
+                    loan.getStatus() + " to " + newStatus);
+        }
+
+        loan.setStatus(newStatus);
         return repo.save(loan);
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
-    public void expireOldPendingLoans() {
-        System.out.println("[SCHEDULER] Running scheduled check...");
+    @Scheduled(cron = "0 0 0 * * *") // Runs daily at midnight
+    public void processPendingLoanExpirations() {
+        LocalDate expirationThreshold = LocalDate.now().minusDays(PENDING_EXPIRATION_DAYS);
 
-        List<Loan> allLoans = repo.findAll();
-        LocalDate now = LocalDate.now();
-
-        for (Loan loan : allLoans) {
-            if ("PENDING".equalsIgnoreCase(loan.getStatus()) &&
-                    loan.getApplicationDate() != null &&
-                    loan.getApplicationDate().isBefore(now.minusDays(7))) {
-
-                loan.setStatus("EXPIRED");
-                repo.save(loan);
-                System.out.println("[SCHEDULER] Loan ID " + loan.getId() + " marked as EXPIRED.");
-            }
-        }
+        repo.findAllByStatusAndApplicationDateBefore(LoanStatus.PENDING, expirationThreshold)
+                .forEach(loan -> {
+                    loan.setStatus(LoanStatus.EXPIRED);
+                    repo.save(loan);
+                    // In production, you might want to add logging here
+                });
     }
-
 }
