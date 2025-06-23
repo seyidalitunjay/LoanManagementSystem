@@ -2,13 +2,15 @@ package org.example.loanms.Service;
 
 import org.example.loanms.Enum.LoanStatus;
 import org.example.loanms.Exceptions.LoanNotFoundException;
+import org.example.loanms.Exceptions.LoanValidationException;
 import org.example.loanms.Model.Loan;
 import org.example.loanms.Repo.LoanRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -18,10 +20,14 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class LoanServiceTest {
 
     @Mock
     private LoanRepo loanRepo;
+
+    @Mock
+    private LoanValidator loanValidator;
 
     @InjectMocks
     private LoanService loanService;
@@ -30,12 +36,12 @@ public class LoanServiceTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
         loan = new Loan(1L, "John Doe", 10000L, 12, "Car", LoanStatus.PENDING, LocalDate.now().minusDays(10));
     }
 
     @Test
     public void testCreateLoan_Valid() {
+        // No need to mock validator for happy path since it's void
         when(loanRepo.save(any(Loan.class))).thenReturn(loan);
 
         Loan createdLoan = loanService.createLoan(loan);
@@ -48,8 +54,12 @@ public class LoanServiceTest {
     @Test
     public void testCreateLoan_InvalidAmount() {
         loan.setAmount(-100);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> loanService.createLoan(loan));
-        assertEquals("Loan amount must be greater than 0", exception.getMessage());
+        doThrow(new LoanValidationException("Loan amount must be at least 1000"))
+                .when(loanValidator).validateLoanCreation(loan);
+
+        Exception exception = assertThrows(LoanValidationException.class,
+                () -> loanService.createLoan(loan));
+        assertEquals("Loan amount must be at least 1000", exception.getMessage());
     }
 
     @Test
@@ -79,6 +89,7 @@ public class LoanServiceTest {
     public void testUpdateLoanStatus_ValidTransition() {
         when(loanRepo.findById(1L)).thenReturn(Optional.of(loan));
         when(loanRepo.save(any(Loan.class))).thenReturn(loan);
+        // No need to mock validator for happy path
 
         Loan updatedLoan = loanService.updateLoanStatus(1L, LoanStatus.APPROVED);
 
@@ -88,11 +99,14 @@ public class LoanServiceTest {
 
     @Test
     public void testUpdateLoanStatus_InvalidTransition() {
-        loan.setStatus(LoanStatus.COMPLETED); // Terminal status
+        loan.setStatus(LoanStatus.COMPLETED);
         when(loanRepo.findById(1L)).thenReturn(Optional.of(loan));
+        doThrow(new LoanValidationException("Cannot change status from terminal status: COMPLETED"))
+                .when(loanValidator).validateStatusTransition(loan.getStatus(), LoanStatus.APPROVED);
 
-        assertThrows(IllegalStateException.class,
+        Exception exception = assertThrows(LoanValidationException.class,
                 () -> loanService.updateLoanStatus(1L, LoanStatus.APPROVED));
+        assertEquals("Cannot change status from terminal status: COMPLETED", exception.getMessage());
     }
 
     @Test
