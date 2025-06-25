@@ -1,4 +1,4 @@
-[LoanMS_Environment.json](https://github.com/user-attachments/files/20898645/LoanMS_Environment.json)[LoanMS_Environment.json](https://github.com/user-attachments/files/20898630/LoanMS_Environment.json)[LoanMS_Postman_Collection.json](https://github.com/user-attachments/files/20898627/LoanMS_Postman_Collection.json)# Loan Management System
+Loan Management System
 
 A backend service for banks or financial institutions to manage loan applications digitally. 
 This system automatically tracks loan statuses and expires applications that aren't processed within 7 days.
