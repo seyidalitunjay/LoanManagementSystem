@@ -1,4 +1,4 @@
-# Loan Management System
+[LoanMS_Environment.json](https://github.com/user-attachments/files/20898645/LoanMS_Environment.json)[LoanMS_Environment.json](https://github.com/user-attachments/files/20898630/LoanMS_Environment.json)[LoanMS_Postman_Collection.json](https://github.com/user-attachments/files/20898627/LoanMS_Postman_Collection.json)# Loan Management System
 
 A backend service for banks or financial institutions to manage loan applications digitally. 
 This system automatically tracks loan statuses and expires applications that aren't processed within 7 days.
@@ -71,6 +71,78 @@ POSTMAN TEST CASES:
 <img width="1025" alt="Screenshot 2025-06-23 at 11 07 08" src="https://github.com/user-attachments/assets/2baa83a1-2f86-444e-b815-30be9b3d1ab0" />
 
 <img width="1025" alt="Screenshot 2025-06-23 at 11 21 27" src="https://github.com/user-attachments/assets/38c274dc-a41c-4d94-94b9-3089d99d1e2f" />
+
+
+## 📬 Postman Integration Testing
+
+> Make sure your server is running at `http://localhost:8080`
+
+- 👉 [Download Postman Collection]
+
+[Uploading Lo{
+	"info": {
+		"_postman_id": "d9045a37-03c3-470e-9910-e950c4b2f40a",
+		"name": "Loan Management Integration Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45868998"
+	},
+	"item": [
+		{
+			"name": "Create a new loan",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Get all loans",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Get loan by ID",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Update loan status",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}anMS_Postman_Collection.json…]()
+
+
+- 🌍 [Download Postman Environment]
+
+  
+[Uploading Lo{
+	"id": "70745108-69b1-4fad-a938-b08f32b133b5",
+	"name": "LoanMS Local",
+	"values": [
+		{
+			"key": "loanId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-06-25T07:25:07.578Z",
+	"_postman_exported_using": "Postman/11.51.3"
+}anMS_Environment.json…]()
+
+
 
 **Developed by @seyidalitunjay**
 
